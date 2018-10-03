@@ -1,34 +1,15 @@
-# import pandas as pd
-# import csv
-# data_xls = pd.read_excel('C:/Users/hengy/PycharmProjects/noVenv/2011InternationalComparisonProgramresults - Copy.xlsx', 'TABLE R1',)
-# data_xls.to_csv('file.csv', encoding='utf-8', quoting=csv.QUOTE_NONNUMERIC)
-
-
 import xlrd
 import csv
+import boto3
+import botocore
 from datetime import datetime
 
-def csv_from_excel():
+def csv_from_excel(xlsFile):
     start = datetime.now()
-    xlsFile = 'C:/Users/hengy/Downloads/News_Final.xls'
 
     wb = xlrd.open_workbook(xlsFile)
-    #change sheet name
     sh = wb.sheet_by_index(0)
-    # sh = wb.sheet_by_name('News_Final')
-    print(sh)
-
-        #newline
-        #print runtime
-    #general to date, imp
-    #xls to csv, then zip csv, not important
-    #check if file is too big
-    #download excel
-    #connect amazon s3, get 90% code
-        #find 66MB xls file
-        #call helpdesk to download python
-    #how it processes dates
-    #how fast is the code, n^2, important
+    print(sh.colinfo_map)
 
     count=0
     with open('file.csv', 'w', newline='') as your_csv_file:
@@ -36,7 +17,6 @@ def csv_from_excel():
         for rownum in range(sh.nrows):
             try:
                 count+=1
-
                 #print(rownum, sh.row_values(rownum))
                 wr.writerow(sh.row_values(rownum))
             except UnicodeEncodeError:
@@ -47,7 +27,28 @@ def csv_from_excel():
     print('run time: ', end-start)
     print('start: ', start)
     print('end: ', end)
-    print(count)
+    print('# of rows: ', count)
     your_csv_file.close()
 
-csv_from_excel()
+s3 = boto3.resource('s3')
+
+# Print out bucket names
+for bucket in s3.buckets.all():
+    print(bucket.name)
+
+BUCKET_NAME = 'my-bucket' # replace with your bucket name
+KEY = 'my_image_in_s3.jpg' # replace with your object key
+
+try:
+    s3.Bucket(BUCKET_NAME).download_file(KEY, 'my_local_image.jpg')
+except botocore.exceptions.ClientError as e:
+    if e.response['Error']['Code'] == "404":
+        print("The object does not exist.")
+    else:
+        raise
+
+csv_from_excel('C:/Users/hengy/Downloads/News_Final.xls')
+
+# Upload a file
+data = open('file.csv', 'rb')
+s3.Bucket('my-bucket').put_object(Key='file.csv', Body=data)
