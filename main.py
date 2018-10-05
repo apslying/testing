@@ -1,42 +1,32 @@
-import xlrd
+import pandas as pd
 import csv
 from datetime import datetime
 
-def csv_from_excel(xlsFile):
+def csv_from_excel(xlsFile, csvFile):
     start = datetime.now()
 
-    wb = xlrd.open_workbook(xlsFile)
-    sh = wb.sheet_by_index(0)
+    df = pd.read_excel(xlsFile)
+    df.to_csv(csvFile, index=False)
 
-    # edit date column data
+    end= datetime.now()
+    print('run time: ', end-start)
+    print('start: ', start)
+    print('end: ', end)
 
-    # specify date column, add looping
-    colnum = 5
-    for row in range(1, sh.nrows):
-        # TODO: assumes first row header
-        cellValue = sh.cell(row, colnum).value
-        dt = xlrd.xldate.xldate_as_datetime(cellValue, 0)
-        # TODO: import xlwt to write to cells
+csv_from_excel('your_xls.xls', 'your_csv.csv')
+    #replace with 'your_xls.xls' with your xls/xlsx file name. same with csv
+    #include full path if not in current directory. change \ to / in path
 
-    with open('file.csv', 'w', newline='') as your_csv_file:
-        wr = csv.writer(your_csv_file, quoting=csv.QUOTE_ALL)
-        for rownum in range(sh.nrows):
-            try:
-                wr.writerow(sh.row_values(rownum))
-            except UnicodeEncodeError:
-                pass
-        for rownum in range(sh.nrows):
-            try:
-                #print(rownum, sh.row_values(rownum))
-                wr.writerow(sh.row_values(rownum))
-            except UnicodeEncodeError:
-                pass
 
-    end = datetime.now()
-    # print('run time: ', end-start)
-    # print('start: ', start)
-    # print('end: ', end)
-    your_csv_file.close()
 
-csv_from_excel('C:/Users/hengy/Downloads/News_Final.xls')
+
+    #1. Quoting: default quoting = csv.QUOTE_MINIMAL
+    #2. Dates: default date format is YYYY-MM-DD
+    #3. Numbers: numbers are displayed correctly. (2017 is NOT displayed as 2017.0)
+    #4. NULL: NULL is handled correctly. Blank cell will be displayed as ,,
+    #5. Trailing/Leading Zeros: This is a non issue. Ex. 000123 and 0.1000 must be stored
+    #   as text. (attempting to store 000123 as a number will store 123 instead). Text
+    #   is easily processed correctly.
+    #6. Headers: default include headers. set header=False to omit.
+    #TODO: log file
 
