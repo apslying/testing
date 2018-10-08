@@ -1,9 +1,12 @@
 import pandas as pd
 import csv
 from datetime import datetime
+import logging
+import sys
 
 def csv_from_excel(xlsFile, csvFile):
     start = datetime.now()
+    logging.basicConfig(filename='logFile.log', level=logging.INFO)
 
     df = pd.read_excel(xlsFile, dtype={'your_col1':str, 'your_col2':str})
     #replace 'your_col1' with your column name. Delete or add more columns
@@ -15,11 +18,15 @@ def csv_from_excel(xlsFile, csvFile):
         #Header (2 options): True (default), False
 
     end= datetime.now()
-    print('run time: ', end-start)
-    print('start: ', start)
-    print('end: ', end)
+    logging.info('run time:  %s' %(end-start)  )
+    logging.info('start:  %s' %start )
+    logging.info('end:  %s' %end )
 
-csv_from_excel('your_xls.xls', 'your_csv.csv')
+try:
+    csv_from_excel('your_xls.xls', 'your_csv.csv')
+except:
+    logging.error(sys.exc_info()[1])
+
     #replace 'your_xls.xls' with your xls/xlsx file name. same with csv
     #include full path if not in current directory. change \ to / in path
 
