@@ -1,8 +1,11 @@
+#Sample usage in terminal: Python main.py your_xls.xls your_csv.csv
 import pandas as pd
 import csv
 from datetime import datetime
 import logging
 import sys
+import argparse
+
 
 def csv_from_excel(xlsFile, csvFile):
     start = datetime.now()
@@ -20,16 +23,20 @@ def csv_from_excel(xlsFile, csvFile):
     end= datetime.now()
     logging.info('run time:  %s' %(end-start)  )
     logging.info('start:  %s' %start )
-    logging.info('end:  %s' %end )
+    logging.info('end:  %s \n' %end )
 
 try:
-    csv_from_excel('your_xls.xls', 'your_csv.csv')
+    #Create command line parser with two positional arguments
+    parser = argparse.ArgumentParser(description = 'xls(x) to csv converter')
+    parser.add_argument('your_xls', type = str, nargs=1, help = 'excel file name' )
+    parser.add_argument('your_csv', type = str, nargs=1, help = 'csv file name' )
+    args = parser.parse_args()
+
+    #call the function with file names receive in command line
+    csv_from_excel(args.your_xls[0], args.your_csv[0])
+
 except:
-    logging.error(sys.exc_info()[1])
-
-    #replace 'your_xls.xls' with your xls/xlsx file name. same with csv
-    #include full path if not in current directory. change \ to / in path
-
+    logging.error('%s \n' %(sys.exc_info()[1]))
 
     #1. Quoting: default quoting = csv.QUOTE_MINIMAL(line 9)
     #2. Dates: default date format is YYYY-MM-DD
@@ -39,5 +46,4 @@ except:
     #   as text. (attempting to store 000123 as a number will store 123 instead). Text
     #   is easily processed correctly.
     #6. Headers: default include headers. To omit set header=False(line 9)
-    #TODO: log file
 
